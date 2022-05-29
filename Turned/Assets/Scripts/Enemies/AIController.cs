@@ -50,56 +50,55 @@ public class AIController : MonoBehaviour
             target = FindObjectOfType<PlayerController>().transform;
 
         };
-        if (target == null)
-        {
-            return;
-        }
 
+        if (agent == null) return;
+        switch (_behaviour)
+        {
+            case Behaviour.human:
+                agent.speed = 3f;
+                if (canWander)
+                {
+                    StartCoroutine(Wander());
+                }
+
+                // if (agent != null)
+                // {
+                //     RunFrom(target);
+                // }
+                
+                break;
+            case Behaviour.zombie:
+                agent.speed = 3.2f;
+                if (canWander)
+                {
+                    StartCoroutine(Wander());
+                }
+                break;
+            case Behaviour.police:
+                agent.speed = 4f;
+                ChasePlayer();
+                break;
+            case Behaviour.army:
+                agent.speed = 4.2f;
+                if (!attackZombie)
+                {
+                    ChasePlayer();
+                }
+                
+                break;
+            default:
+                ChasePlayer();
+                break;
+            
+        }
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (agent == null) return;
-        switch (_behaviour)
-            {
-                case Behaviour.human:
-                    agent.speed = 3f;
-                    if (canWander)
-                    {
-                        StartCoroutine(Wander());
-                    }
-
-                    // if (agent != null)
-                    // {
-                    //     RunFrom(target);
-                    // }
-                
-                    break;
-                case Behaviour.zombie:
-                    agent.speed = 3.2f;
-                    if (canWander)
-                    {
-                        StartCoroutine(Wander());
-                    }
-                    break;
-                case Behaviour.police:
-                    agent.speed = 4f;
-                    ChasePlayer();
-                    break;
-                case Behaviour.army:
-                    agent.speed = 4.2f;
-                    if (!attackZombie)
-                    {
-                        ChasePlayer();
-                    }
-                
-                    break;
-                default:
-                    ChasePlayer();
-                    break;
-            
-        }
+        
+        
         
         
         
@@ -210,6 +209,20 @@ public class AIController : MonoBehaviour
         }
 
         
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (_behaviour == Behaviour.human && other.CompareTag("Player"))
+        {
+            canWander = true;
+            Wander();
+        }
+
+        if (_behaviour == Behaviour.army && other.CompareTag("Player"))
+        {
+            agent.SetDestination(other.transform.position);
+        }
     }
 
     private void OnTriggerEnter(Collider other)

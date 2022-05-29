@@ -16,11 +16,16 @@ public class GameManager : MonoBehaviour
         [SerializeField] private Text levelUpText;
         [SerializeField] private GameObject gameOverUIPanel;
         [SerializeField] private Slider healthBar;
+        [SerializeField] private Image healthPanel;
+        private Color healthPanelColor;
         private int score;
         private float health = 50f;
         [SerializeField] private int maxEnemies;
         [SerializeField] private int maxZombies;
         [SerializeField] private int maxHumans;
+
+        [SerializeField] private Color halfHealth;
+        [SerializeField] private Color quarterHealth;
 
         private float difficultyTimer = 60f;
         private int zombieCounter;
@@ -29,6 +34,7 @@ public class GameManager : MonoBehaviour
 
         private void Start()
         {
+            healthPanelColor = healthPanel.color;
             healthBar.maxValue = health;
             healthBar.value = health;
         }
@@ -47,7 +53,7 @@ public class GameManager : MonoBehaviour
                 levelUpText.enabled = true;
                 yield return new WaitForSeconds(4f);
                 levelUpText.enabled = false;
-                difficultyTimer = 60f;
+                difficultyTimer = 20f;
             }
         }
 
@@ -79,8 +85,18 @@ public class GameManager : MonoBehaviour
         {
             health -= damageToTake;
             healthBar.value = health;
+            if (health <= healthBar.maxValue / 2 && health > healthBar.maxValue / 4)
+            {
+                healthPanel.GetComponent<Image>().color = halfHealth;
+            }
+
+            if (health <= healthBar.maxValue / 4 && health > 0)
+            {
+                healthPanel.GetComponent<Image>().color = quarterHealth;
+            }
             if (health <= 0)
             {
+                healthPanel.GetComponent<Image>().color = Color.black;
                 GameOver();
             }
         }
@@ -92,6 +108,20 @@ public class GameManager : MonoBehaviour
             {
                 health = healthBar.maxValue;
             }
+
+            if (health > healthBar.maxValue / 2)
+            {
+                healthPanel.GetComponent<Image>().color = Color.clear;
+            }
+            if (health <= healthBar.maxValue / 2 && health > healthBar.maxValue / 4)
+            {
+                healthPanel.GetComponent<Image>().color = halfHealth;
+            }
+
+            if (health <= healthBar.maxValue / 4 && health > 0)
+            {
+                healthPanel.GetComponent<Image>().color = quarterHealth;
+            }
             healthBar.value = health;
         }
         
@@ -100,6 +130,7 @@ public class GameManager : MonoBehaviour
         {
             gameOverUIPanel.SetActive(true);
             gameOverScore.text = GetScore().ToString();
+            Time.timeScale = 0;
         }
 
         public void ResetGame()
