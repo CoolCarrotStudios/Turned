@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
+        Time.timeScale = 1;
         _sounds = GetComponent<AISounds>();
         _gameManager = FindObjectOfType<GameManager>();
         rb = GetComponent<Rigidbody>();
